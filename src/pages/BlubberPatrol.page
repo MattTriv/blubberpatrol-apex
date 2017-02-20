@@ -1,0 +1,83 @@
+<apex:page docType="html-5.0" controller="BlubberPatrolCharts">
+    
+    <!-- Google Visualization API code. No JavaScript code is needed for the original Chart API. -->
+	<script type="text/javascript" src="https://www.google.com/jsapi"></script> <!-- Load the AJAX API -->
+	<script type="text/javascript">
+    google.load('visualization', '1.0', {'packages':['corechart']}); // Load the Visualization API and the chart package.
+
+    // Set a callback to run when the Google Visualization API is loaded.
+    google.setOnLoadCallback(drawChart);
+
+    // The callback will always execute, but will only draw a chart when the Apex controller sets printChart to true.
+	function drawChart() {
+        //We can't check the length of !chartData because it has embedded quotes that screw things up when you try to do anything with it.
+        //Instead, we use a boolean !printChart, though it gets cast as a string here, which is easy enough to handle.
+        //Getting this syntax right was very tricky, so don't even think about modifying it.
+        var printChart = '{!printChart}';
+        if (printChart == 'false') {return;}
+        var data = google.visualization.arrayToDataTable([[{!chartData}]]);
+		var options = {{!chartOptions}};
+		var chart = new google.visualization.ColumnChart(document.getElementById('chart_div1'));
+		chart.draw(data, options);
+    }
+	</script>
+    
+    <!-- 
+    We use a panelGrid with 2 columns. 
+    In column 1 of the first row, is a nested panelGrid with 2 columns holding the radio buttons & number fields.
+    In the second column are the charts.
+    In the second row are the API radios & command button
+     -->
+	<apex:form >
+		<apex:pageBlock title="BlubberPatrol">
+            <apex:panelGrid columns="2">
+                <apex:panelGroup>
+                    <apex:panelGrid columns="2" border="0" id="theGrid" width="100%">
+                        <apex:panelGroup id="readioGroup">
+               			  <apex:selectRadio value="{!selectedRadioVal}" id="chooseChart" layout="pageDirection">
+							<apex:selectOption itemValue="dailyChart" itemLabel="Daily Chart"/>
+                			<apex:selectOption itemValue="weeklyChart" itemLabel="Weekly Chart"/>
+							<apex:selectOption itemValue="monthlyChart" itemLabel="Monthly Chart"/>
+                			<apex:selectOption itemValue="quarterlyChart" itemLabel="Quarterly Chart"/>
+                			<apex:selectOption itemValue="yearlyChart" itemLabel="Yearly Chart"/>
+	                		<!-- the actionSupport component adds Ajax capabilities to our Status field. -->
+    	            		<apex:actionSupport event="onchange" rerender="Status" action="{!updateStatus}"/>                
+						  </apex:selectRadio>
+                        </apex:panelGroup>
+                        <apex:panelGroup id="inputGroup">
+                            <apex:input value="{!numberOfDailyBars}"     type="number" html-min="1" html-max="60" style="width: 40px; margin-bottom:3px; margin-top:8px;" html-autofocus="true" /><br />
+                            <apex:input value="{!numberOfWeeklyBars}"    type="number" html-min="1" html-max="52" style="width: 40px; margin-bottom:4px;"/><br />
+                            <apex:input value="{!numberOfMonthlyBars}"   type="number" html-min="1" html-max="36" style="width: 40px; margin-bottom:4px;"/><br />                		
+                            <apex:input value="{!numberOfQuarterlyBars}" type="number" html-min="1" html-max="36" style="width: 40px; margin-bottom:4px;"/><br />                       
+                		    <apex:input value="{!numberOfYearlyBars}"    type="number" html-min="1" html-max="10" style="width: 40px; margin-bottom:4px;"/><br />                       
+                	    </apex:panelGroup>
+                        <apex:panelGrid>
+                            <apex:panelGroup>
+                                <hr/>
+                                <apex:selectRadio value="{!whichAPI}" id="whichAPI" layout="pageDirection">
+                                    <apex:selectOption itemvalue="oldAPI" itemLabel="Use Google Chart API"/>
+                                    <apex:selectOption itemvalue="newAPI" itemlabel="Use Google Visualization API"/>
+                                </apex:selectRadio>
+                            </apex:panelGroup>
+                            <apex:panelGroup>
+                                <div align="Center"> <!-- We need this Div to senter the button. -->
+                                    <apex:commandButton action="{!makeChart}" value="Make Chart"/>
+                                </div>
+                            </apex:panelGroup>                            
+                        </apex:panelGrid>
+                    </apex:panelGrid>
+                </apex:panelGroup>
+                <apex:panelGroup>
+                    <apex:image url="{!chartURL}" />
+                    <div id="chart_div1"></div>
+                </apex:panelGroup>
+            </apex:panelGrid>
+        </apex:pageBlock>
+    </apex:form>
+    
+    <!-- the outputPanel demarks the part of the page to receive Ajax updates. -->
+    <apex:outputpanel id="Status">
+    	<apex:outputText value="{!statusValue}"></apex:outputText>
+    </apex:outputpanel>
+    
+</apex:page>
