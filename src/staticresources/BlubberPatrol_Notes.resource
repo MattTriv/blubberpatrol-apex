@@ -1,4 +1,4 @@
- Resume on: unit testing.
+ Resume on: getting GitHub/SourceTree working; then unit testing.
 
 To Do:
 *) Need to write test cases.
