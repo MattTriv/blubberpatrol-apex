@@ -14,6 +14,13 @@ public class BlubberPatrolCharts{
     public string chartOptions {get;set;}
     public string whichAPI {get;set;}
     
+    public class chartData {
+        //Holds datapoints and axis labels for the old API.
+        public double weight {get;set;}
+        public string date1  {get;set;}
+        public string date2  {get;set;}
+    }
+
     //Constructor:
     public BlubberPatrolCharts(){
         selectedRadioVal='dailyChart'; //Set the default radio button. There is no "checked" attribute like in HTML.
@@ -396,14 +403,13 @@ public class BlubberPatrolCharts{
         DateTime dt=DateTime.newInstance(2017,01,01);
         List<double> data = new List<double>();
         List<String> labels = new List<String>();
-        List<double> weights = new List<double>();
-        List<string> dates1 = new List<string>();
-        List<string> dates2 = new List<string>();
+        chartData cd;
+        List<chartData> theData = new List<chartData>();
           
         //We have to use Dynamic SOQL here because the colon prevents the months variable from being concatenated:
         sql='Select Date__c, Weight__c FROM Weight__c Where (Date__c >= LAST_N_WEEKS:' + weeks + ') and (Weight__c > 0) Order By Date__c';
         
-        //Put the results into a list and aggregate manually:
+        //The first pass is to aggregate, and put the data into temporary arrays:
 		List<Weight__c> results = Database.query(sql);
         dt=results[0].Date__c;
         displayDate=dt.format('MMM dd yy');
@@ -413,9 +419,9 @@ public class BlubberPatrolCharts{
             weekYear=dt.format('w') + dt.format('YYYY');
             if (weekYear<>last){
               	x=totalWeight/datapoints;
-                w=x.setScale(2);            
+                w=x.setScale(2);         
                 data.add(w);
-                labels.add(displayDate);
+                labels.add(displayDate); //Every datapoint gets a label for now.
                 displayDate=dt.format('MMM dd yy');
                 last=weekYear;
                 datapoints=1;
@@ -431,45 +437,45 @@ public class BlubberPatrolCharts{
         data.add(w);
         labels.add(displayDate);
         
-        //If the user specifies more bars than we have data for, print them all. Otherwise, print just the number they specified:
+        //The second pass is to decide which labels to keep, and transfer the data into an array of chartData objects. If
+        //the users specifies more bars than we have data for, print them all. Otherwise, print just the number they specified:
         if (weeks>data.size()){startAt=0;} else {startAt=data.size()-weeks;}
         for (Integer i = startAt; i < data.size(); i++) {
-            weights.add(data[i]);
-            dates2.add('');
+            cd = new chartData();
+            cd.weight=data[i];
+            cd.date2=''; //The second row of x-axis labels is not used on this chart.
             
             //Apex has no CASE statement. So, we use IFs:
-            if (weeks<=8) {
-                //Put a label on every bar.
-                dates1.add(labels[i]);               
-            }
+            if (weeks<=8) cd.date1=labels[i]; //Put a label on every bar.
             if (weeks>8 && weeks<=16){
 				//Put a label on every other bar:
-                if (skip==false) {skip=true;} else {skip=false;}
-                if (skip) {dates1.add('');} else {dates1.add(labels[i]);}
+                if (skip==false) skip=true; else skip=false;
+                if (skip) cd.date1=''; else cd.date1=labels[i];
             }
             if (weeks>16 && weeks<=32){
 				//Put a label on every third bar:
                 if (skipNo<>3) {
                     skipNo++;
-                    dates1.add('');
+                    cd.date1='';
                 } else {
                     skipNo=0;
-                    dates1.add(labels[i]);
+                    cd.date1=labels[i];
                 }
             }         
             if (weeks>32){
 				//Put a label on every fifth bar:
                 if (skipNo<>10) {
                     skipNo++;
-                    dates1.add('');
+                    cd.date1='';
                 } else {
                     skipNo=0;
-                    dates1.add(labels[i]);
+                    cd.date1=labels[i];
                 }
-            }  
+            }
+            theData.add(cd);  
         }
 
-        formatChartOld(weights,dates1,dates2,'Weekly Weight');
+        formatChartOld(theData,'Weekly Weight');
     }
 
     private void makeDailyChartNew(integer days){
@@ -492,16 +498,6 @@ public class BlubberPatrolCharts{
         if (chartData.endsWith(']')){chartData=chartData.left(chartData.length()-1);} //Remove the last square bracket since it will be added in the JavaScript.
 
         setChartOptions('Daily Weight');
-    }
-    
-    //All of the other "old" methods use parallel Lists to hold chart data. In makeDailyChartOld() below
-    //we use an array of chartData objects instead. We did this as an exercise while learning the
-    //language. However, formatChartOld() still needs its data in the old format, so we made an overload
-    //method that takes the array of chartData objects.
-    public class chartData {
-        public double weight {get;set;}
-        public string date1  {get;set;}
-        public string date2  {get;set;}
     }
 
     private void makeDailyChartOld(integer days){
