@@ -1,4 +1,4 @@
- Resume on: unit testing.
+ Resume on: finishing the refactoring of "old" methods; then go back to unit testing.
 
 To Do:
 *) Need to write test cases.

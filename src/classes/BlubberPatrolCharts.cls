@@ -15,7 +15,7 @@ public class BlubberPatrolCharts{
     public string whichAPI {get;set;}
     
     public class chartData {
-        //Holds datapoints and axis labels for the old API.
+        //Holds datapoints and axis labels for the old API..
         public double weight {get;set;}
         public string date1  {get;set;}
         public string date2  {get;set;}
