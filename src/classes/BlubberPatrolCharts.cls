@@ -14,8 +14,8 @@ public class BlubberPatrolCharts{
     public string chartOptions {get;set;}
     public string whichAPI {get;set;}
     
-    public class chartData {
-        //Holds datapoints and axis labels for the old API..
+    @TestVisible public class chartDatapoint {
+        //Holds datapoints and axis labels for the old API.
         public double weight {get;set;}
         public string date1  {get;set;}
         public string date2  {get;set;}
@@ -113,9 +113,8 @@ public class BlubberPatrolCharts{
     private void makeYearlyChartOld(integer years){    
         decimal x=0.00; decimal w=0.00;
         string s, year;
-        List<double> weights=new List<double>();
-        List<string> dates1=new List<string>();
-        List<string> dates2=new List<string>();
+        chartDatapoint cd;
+        List<chartDatapoint> theData=new List<chartDatapoint>();
         
         //We get the data in DESC order, so need to push onto the arrays. See notes in 'new' method.
         for (aggregateResult results: [Select Calendar_Year(Date__c) Year, Avg(Weight__c) AveWeight from Weight__c Where (Weight__c > 0) Group By Calendar_Year(Date__c) Order By Calendar_Year(Date__c) DESC LIMIT :years]) {
@@ -124,12 +123,14 @@ public class BlubberPatrolCharts{
             x=Decimal.valueOf(s);
             w=x.setScale(2);
             year=string.valueOf(results.get('Year'));
-            if (weights.size()==0) weights.add(w); else weights.add(0,w); //Can't push until there is at least one element in the list.
-            if (dates1.size()==0) dates1.add(year); else dates1.add(0,year);
-            dates2.add(''); //This is easier than leaving it empty.
+            cd=new chartDatapoint();
+            cd.weight=w;
+            cd.date1=year;
+            cd.date2='';
+            //Can't push until there is at least one element in the list:            
+            if (theData.size()==0) theData.add(cd); else theData.add(0,cd);
         }
-
-        formatChartOld(weights,dates1,dates2,'Yearly Chart');
+        formatChartOld(theData,'Yearly Chart');
     }
 
     private void makeQuarterlyChartNew(integer quarters){ 
@@ -182,12 +183,12 @@ public class BlubberPatrolCharts{
         boolean skip=false;
         List<Double> data = new List<Double>();
         List<String> labels = new List<String>();
-        List<double> weights=new List<double>();
-        List<string> dates1=new List<string>();
-        List<string> dates2=new List<string>();
+        chartDatapoint cd;
+        List<chartDatapoint> theData = new List<chartDatapoint>();
         
         //See the comments in makeQuarterlyChartNew().
         
+        //First pass.
         for (aggregateResult years: [Select Calendar_Year(Date__c) Year, count(ID) from Weight__c Group By Calendar_Year(Date__c) Order By Calendar_Year(Date__c)]) {
         	year=string.valueOf(years.get('Year'));
             iYear=Integer.valueOf(year);
@@ -204,25 +205,27 @@ public class BlubberPatrolCharts{
             }
         }
         
+        //Second pass.
         if (quarters>data.size()){startAt=0;} else {startAt=data.size()-quarters;}
 		for (integer i = startAt; i < data.size(); i++) {
-            weights.add(data[i]);
-            dates2.add(''); //The second x axis is not used on this cart, so fill it up with blanks.
+            cd=new chartDatapoint();
+            cd.weight=data[i];
+            cd.date2=''; //The second x axis is not used on this chart, so fill it up with blanks.
             if (quarters>12){
 				//Put a label on every other bar:
                 //skip=!skip; //Don't know why this doesn't work.
                 if (skip==false) {skip=true;} else {skip=false;}
                 if (skip) {
-                    dates1.add('');
+                    cd.date1='';
                 } else {
-                    dates1.add(labels[i]);
+                    cd.date1=labels[i];
                 }
             } else {
-                dates1.add(labels[i]); //Put a label on every bar.
+                cd.date1=labels[i]; //Put a label on every bar.
             }
+            theData.add(cd);
         }
-        
-        formatChartOld(weights,dates1,dates2,'Quarterly Chart');
+        formatChartOld(theData,'Quarterly Chart');
     }
     
     private void makeMonthlyChartNew(integer months){   
@@ -277,17 +280,16 @@ public class BlubberPatrolCharts{
         boolean skip=false;
         integer datapoints=0; integer startAt=0; integer skipNo=0;
         DateTime dt=DateTime.newInstance(2017,01,01);
-        List<Double> data = new List<Double>();
-        List<String> labels = new List<String>();
-        List<String> labels2 = new List<String>();
-        List<double> weights = new List<double>();
-        List<string> dates1 = new List<string>();
-        List<string> dates2 = new List<string>();
+        List<Double> data = new List<Double>();    //These 3 lists are used in the first pass of data.
+        List<String> labels = new List<String>();  //These 3 lists are used in the first pass of data.
+        List<String> labels2 = new List<String>(); //These 3 lists are used in the first pass of data.
+        chartDatapoint cd;
+        List<chartDatapoint> theData = new List<chartDatapoint>();
           
         //We have to use Dynamic SOQL here because the colon prevents the months variable from being concatenated:
         sql='Select Date__c, Weight__c FROM Weight__c Where (Date__c >= LAST_N_MONTHS:' + months + ') and (Weight__c > 0) Order By Date__c';
         
-        //Put the results into a list and aggregate manually:
+        //In the first pass, we put the results into a list and aggregate manually:
 		List<Weight__c> results = Database.query(sql);
         last=string.valueOf(results[0].Date__c.month()) + string.valueOf(results[0].Date__c.year());
         for (Weight__c rec : results) {
@@ -314,34 +316,33 @@ public class BlubberPatrolCharts{
         labels.add(displayDate);
         if (displayDate=='Jan') labels2.add(dt.format('YYYY')); else labels2.add('');
 
-        //If the user specifies more bars than we have data for, print them all. Otherwise, print just the number they specified:
+        //In the second pass, we figure out which labels to print. If the user specifies more bars than we have data for,
+        //print them all. Otherwise, print just the number they specified:
         if (months>data.size()){startAt=0;} else {startAt=data.size()-months;}
         for (integer i=startAt; i<data.size(); i++) {
-            weights.add(data[i]);
-            dates2.add(labels2[i]);
+            cd=new chartDatapoint();
+            cd.weight=data[i];
+            cd.date2=labels2[i];
             //Apex has no CASE statement. So, we use IFs:
-            if (months<=12) {
-                //Put a label on every bar.
-                dates1.add(labels[i]);
-            }
+            if (months<=12) cd.date1=labels[i]; //Put a label on every bar.
             if (months>12 && months<=24){
 				//Put a label on every other bar:
                 if (skip==false) {skip=true;} else {skip=false;}
-                if (skip) dates1.add(''); else dates1.add(labels[i]);
+                if (skip) cd.date1=''; else cd.date1=labels[i];
             }
             if (months>24){
 				//Put a label on every third bar:
                 if (skipNo<>3) {
                     skipNo++;
-                    dates1.add('');
+                    cd.date1='';
                 } else {
                     skipNo=0;
-                    dates1.add(labels[i]);
+                    cd.date1=labels[i];
                 }
-            }            
+            }
+            theData.add(cd);            
         }
-
-        formatChartOld(weights,dates1,dates2,'Monthly Weight');
+        formatChartOld(theData,'Monthly Weight');
     }
 
     private void makeWeeklyChartNew(integer weeks){
@@ -403,8 +404,8 @@ public class BlubberPatrolCharts{
         DateTime dt=DateTime.newInstance(2017,01,01);
         List<double> data = new List<double>();
         List<String> labels = new List<String>();
-        chartData cd;
-        List<chartData> theData = new List<chartData>();
+        chartDatapoint cd;
+        List<chartDatapoint> theData = new List<chartDatapoint>();
           
         //We have to use Dynamic SOQL here because the colon prevents the months variable from being concatenated:
         sql='Select Date__c, Weight__c FROM Weight__c Where (Date__c >= LAST_N_WEEKS:' + weeks + ') and (Weight__c > 0) Order By Date__c';
@@ -441,7 +442,7 @@ public class BlubberPatrolCharts{
         //the users specifies more bars than we have data for, print them all. Otherwise, print just the number they specified:
         if (weeks>data.size()){startAt=0;} else {startAt=data.size()-weeks;}
         for (Integer i = startAt; i < data.size(); i++) {
-            cd = new chartData();
+            cd = new chartDatapoint();
             cd.weight=data[i];
             cd.date2=''; //The second row of x-axis labels is not used on this chart.
             
@@ -505,15 +506,15 @@ public class BlubberPatrolCharts{
         string dayNumber;
         Date tempDate;
         boolean skip=false;
-        chartData cd;
-        List<chartData> theData = new List<chartData>();
+        chartDatapoint cd;
+        List<chartDatapoint> theData = new List<chartDatapoint>();
           
         sql='Select Date__c, Weight__c FROM Weight__c Where (Date__c >= LAST_N_DAYS:' + days + ') and (Weight__c > 0) Order By Date__c';
         
         //No aggregation needed.
         List<Weight__c> results = Database.query(sql);
         for (Weight__c rec : results) {
-            cd = new chartData();
+            cd = new chartDatapoint();
             cd.weight=rec.Weight__c;
             tempDate=rec.Date__c; //We use a Date instead of a DateTime because the DateTime does weird things with the day number.
             dayNumber=string.valueOf(tempDate.day());
@@ -530,13 +531,13 @@ public class BlubberPatrolCharts{
         formatChartOld(theData, 'Daily Weight');
     }
 
-    private void formatChartOld(List<chartData> theData, string title){
+    private void formatChartOld(List<chartDatapoint> theData, string title){
         string chd='chd=t:', chds;
         string chxl0='chxl=0:', chxl1='|1:|', chxl2='|2:|',  chxl3='|3:';
         double weight=0.0, min=999.0, max=0.0;
         integer stepVal=0;
 
-        for (chartData cd : theData) {
+        for (chartDatapoint cd : theData) {
             chxl0 += '|' + cd.date1; 
             chxl3 += '|' + cd.date2;
             weight=cd.weight;
@@ -592,69 +593,7 @@ public class BlubberPatrolCharts{
         chartURL +=  chd;                                  //Data values for y plot.
     }
 
-    private void formatChartOld(List<decimal> weights, List<string> dates1, List<string> dates2, string title){
-        string chd='chd=t:', chds;
-        string chxl0='chxl=0:', chxl1='|1:|', chxl2='|2:|',  chxl3='|3:';
-        double min=999.0, max=0.0;
-        integer stepVal=0;
-
-        for (string label : dates1) {chxl0 += '|' + label;}
-        for (string label : dates2) {chxl3 += '|' + label;} //The second x axis is only used on daily charts.
-
-        for (double weight : weights) {
-            if (weight>max) {max=weight;}
-            if ((weight>0) && (weight<min)) {min=weight;}
-            chd += weight + ',';
-        }
-        if (chd.endsWith(',')){chd=chd.left(chd.length()-1);} //Remove the last comma.
-
-        //Round off min & max:
-        min=Math.floor(min-1);
-        max=Math.ceil(max);
-
-        //Now, make the y & r axis labels. The wider the range, the more numerical distance we need between our labels:
-        stepVal=1;
-        if ((max-min)>10) {stepVal=2;}
-        if ((max-min)>20) {stepVal=3;}
-        if ((max-min)>30) {stepVal=4;}
-        if ((max-min)>40) {stepVal=5;}
-        if ((max-min)>50) {stepVal=6;}
-        if ((max-min)>60) {stepVal=7;}
-        if ((max-min)>70) {stepVal=8;}
-        if ((max-min)>80) {stepVal=9;}
-        for(integer i=(integer)min; i<=max; i=i+stepVal) {
-            chxl1=chxl1 + String.valueOf(i);
-            chxl2=chxl2 + String.valueOf(i);
-            if (i<max) {
-                chxl1=chxl1 + '|';
-                chxl2=chxl2 + '|';
-            }
-        }
-
-        //Set the scaling for the y-axis. Sometimes this is off by a tiny bit. I think it happens when there are
-        //an odd number of y-axis labels such as when using 99 periods. Not sure how to fix it.
-        chds = 'chds=' + String.valueOf(min) + ',' + String.valueOf(max); 
-
-        chartURL =  'https://chart.googleapis.com/chart?';
-        chartURL += 'cht=bvs&';                            //Specify a bar chart.
-        chartURL += 'chs=480x390&';                        //Chart size.
-        chartURL += 'chxt=x,y,r,x&';                       //Turn on the x, y, r & lower x axes.
-        if (selectedRadioVal=='yearlyChart'){              //We don't use the second row of labels on the yearly chart.
-            chartURL += 'chxt=x,y,r&';                     //Turn on the x, y, and r axes.
-            chartURL +=  chxl0 + chxl1 + chxl2 + '&';      //Append the axis labels.
-            chartURL += 'chm=N*2*,FF0000,0,,12&';          //Show data labels only on the yearly chart.
-        } else {
-            chartURL += 'chxt=x,y,r,x&';                   //Turn on the x, y, r, and x axes.
-            chartURL += chxl0+chxl1+chxl2+chxl3 + '&';     //Append the axis labels.
-        }
-        chartURL += 'chbh=a&';                             //Tell it to space the bars evenly, and don't crop any.
-        chartURL += 'chtt=' + title + '&';                 //Chart title.
-        chartURL +=  chds + '&';                           //Scaling for y axis.
-        chartURL += 'chco=0000ff&';                        //Make bars blue.
-        chartURL +=  chd;                                  //Data values for y plot.
-    }
-
-    private void setChartOptions(string title){
+    public void setChartOptions(string title){
         chartOptions  = '\'title\':             \'' + title + '\',';
         chartOptions += '\'titleTextStyle\':    {color: \'black\', fontName: \'Arial\', fontSize: 16, bold: true, italic: false},'; 
         //Make bars narrower on daily chart:
@@ -668,7 +607,7 @@ public class BlubberPatrolCharts{
         chartOptions += '\'chartArea\':         {left: \'10%\', top: \'10%\', width: \'90%\', height: \'75%\'}';  
     }
 
-    private string monthName(integer monthNo) {
+    @TestVisible private string monthName(integer monthNo) {
         if (monthNo==1) return 'Jan';
         if (monthNo==2) return 'Feb';
         if (monthNo==3) return 'Mar';
