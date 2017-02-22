@@ -14,7 +14,9 @@
         //Instead, we use a boolean !printChart, though it gets cast as a string here, which is easy enough to handle.
         //Getting this syntax right was very tricky, so don't even think about modifying it.
         var printChart = '{!printChart}';
+        //alert("Print chart = " + printChart);
         if (printChart == 'false') {return;}
+        //alert("chartData={!chartData}");
         var data = google.visualization.arrayToDataTable([[{!chartData}]]);
 		var options = {{!chartOptions}};
 		var chart = new google.visualization.ColumnChart(document.getElementById('chart_div1'));
@@ -53,31 +55,40 @@
                 	    </apex:panelGroup>
                         <apex:panelGrid>
                             <apex:panelGroup>
-                                <hr/>
+                                <!-- the outputPanel demarks the part of the page to receive Ajax updates. -->
+                                <apex:outputpanel id="Status">
+                                    <apex:outputText value="{!statusValue}"></apex:outputText>
+                                </apex:outputpanel>
+                                <br/><br/><hr/><br/>
                                 <apex:selectRadio value="{!whichAPI}" id="whichAPI" layout="pageDirection">
                                     <apex:selectOption itemvalue="oldAPI" itemLabel="Use Google Chart API"/>
                                     <apex:selectOption itemvalue="newAPI" itemlabel="Use Google Visualization API"/>
                                 </apex:selectRadio>
                             </apex:panelGroup>
                             <apex:panelGroup>
-                                <div align="Center"> <!-- We need this Div to senter the button. -->
+                                <div align="Center"> <!-- We need this Div to center the button. -->
                                     <apex:commandButton action="{!makeChart}" value="Make Chart"/>
+                                    <!-- <apex:commandButton action="{!makeChart}" value="Make Chart" rerender="Charts"/> -->
                                 </div>
                             </apex:panelGroup>                            
                         </apex:panelGrid>
                     </apex:panelGrid>
                 </apex:panelGroup>
                 <apex:panelGroup>
-                    <apex:image url="{!chartURL}" />
-                    <div id="chart_div1"></div>
+                    <apex:outputPanel id="Charts">
+                        <apex:image url="{!chartURL}" />
+                        <div id="chart_div1"></div>
+                        <script type="text/javascript">
+                            // Any js placed here will be fired when output panel is rerendered
+                            (function(){
+                                //drawChart();
+                                //alert("drawChart() called.")
+                            })();
+                        </script>
+                    </apex:outputPanel>
                 </apex:panelGroup>
             </apex:panelGrid>
         </apex:pageBlock>
     </apex:form>
-    
-    <!-- the outputPanel demarks the part of the page to receive Ajax updates. -->
-    <apex:outputpanel id="Status">
-    	<apex:outputText value="{!statusValue}"></apex:outputText>
-    </apex:outputpanel>
     
 </apex:page>

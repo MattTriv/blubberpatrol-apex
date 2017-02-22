@@ -15,7 +15,7 @@ public class BlubberPatrolCharts{
     public string whichAPI {get;set;}
     
     @TestVisible public class chartDatapoint {
-        //Holds datapoints and axis labels for the old API.
+        //Holds datapoints and axis labels for the old API..
         public double weight {get;set;}
         public string date1  {get;set;}
         public string date2  {get;set;}
@@ -36,12 +36,20 @@ public class BlubberPatrolCharts{
     
     //The next two methods are "Action Methods" which are triggered by buttons, links, etc. And controls tagged with apex:actionSupport.
 	public void updateStatus(){
-        if (selectedRadioVal=='dailyChart'){statusValue='Ready to make daily chart.';}
-        if (selectedRadioVal=='weeklyChart') {statusValue='Ready to make weekly chart.';}
-        if (selectedRadioVal=='monthlyChart'){statusValue='Ready to make monthly chart.';}
-        if (selectedRadioVal=='quarterlyChart'){statusValue='Ready to make quarterly chart.';}
-        if (selectedRadioVal=='yearlyChart') {statusValue='Reay to make yearly chart';}
+        if (selectedRadioVal=='dailyChart'){statusValue='Please enter 1 to 60 days.';}
+        if (selectedRadioVal=='weeklyChart') {statusValue='Please enter 1 to 52 weeks.';}
+        if (selectedRadioVal=='monthlyChart'){statusValue='Please enter 1 to 36 months.';}
+        if (selectedRadioVal=='quarterlyChart'){statusValue='Please enter 1 to 36 quarters.';}
+        if (selectedRadioVal=='yearlyChart') {statusValue='Please enter 1 to 10 years.';}
 	}
+
+    public void xmakeChart() {
+        chartURL=''; chartData=''; chartOptions=''; printChart=false;
+        system.debug(' - Making chart...');
+        makeYearlyChartNew(Integer.ValueOf(numberOfYearlyBars));
+        system.debug(' printChart =' + printChart);
+        system.debug(' chartData  =' + chartData);
+    }
 
     public PageReference makeChart(){
         chartURL=''; chartData=''; chartOptions=''; printChart=false;
@@ -73,7 +81,7 @@ public class BlubberPatrolCharts{
                 makeYearlyChartNew(Integer.ValueOf(numberOfYearlyBars));
 
         Return null;
-        //This method returns a PageReference, which is a URL, paramaters, etc.
+        //This method returns a PageReference, which is a URL.
         //By returning null, I think we are telling the browser to stay on the same page.
         //This would send the user to Google:
         //PageReference pageRef = new PageReference('http://www.google.com');
@@ -107,7 +115,7 @@ public class BlubberPatrolCharts{
         //Remove the last square bracket. We leave off the first and last brackets because they are added on the VF page.
         if (chartData.endsWith(']')){chartData=chartData.left(chartData.length()-1);} 
 
-        setChartOptions('Yearly Weight');      
+        setChartOptions('Yearly Weight');
     }
 
     private void makeYearlyChartOld(integer years){    
