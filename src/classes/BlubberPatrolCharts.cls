@@ -1,7 +1,6 @@
 public class BlubberPatrolCharts{
     //Methods marked "Old" use the original Google Chart API. "New" methods use the newer Google Visualization API.
     //These are automatic properties. You don't have to put code in the get() and set() methods.
-    public boolean printChart {get;set;}
     public integer numberOfDailyBars {get;set;}
     public integer numberOfWeeklyBars {get;set;}
     public integer numberOfMonthlyBars {get;set;}
@@ -43,16 +42,8 @@ public class BlubberPatrolCharts{
         if (selectedRadioVal=='yearlyChart') {statusValue='Please enter 1 to 10 years.';}
 	}
 
-    public void xmakeChart() {
-        chartURL=''; chartData=''; chartOptions=''; printChart=false;
-        system.debug(' - Making chart...');
-        makeYearlyChartNew(Integer.ValueOf(numberOfYearlyBars));
-        system.debug(' printChart =' + printChart);
-        system.debug(' chartData  =' + chartData);
-    }
-
     public PageReference makeChart(){
-        chartURL=''; chartData=''; chartOptions=''; printChart=false;
+        chartURL=''; chartData=''; chartOptions='';
         
         if (selectedRadioVal=='dailyChart')
             if (whichAPI == 'oldAPI')
@@ -93,7 +84,6 @@ public class BlubberPatrolCharts{
         decimal x, w;
         List<string> elements = new List<string>();
 
-        printChart=true;
         chartData='\'Year\', \'Weight\', {role: \'style\'}]';
 
         //Using LIMIT gets us the first n records, when we want the most-recent instead. Using DESC gets them, but in the 
@@ -149,7 +139,6 @@ public class BlubberPatrolCharts{
         List<Double> data = new List<Double>();
         List<String> labels = new List<String>();
 
-        printChart=true;
         chartData='\'Quarter\', \'Weight\', {role: \'style\'}]';
         
         //There doesn't seem to be a way to get SOQL to aggregate on quarters. You can do it in reports, but they 
@@ -244,7 +233,6 @@ public class BlubberPatrolCharts{
         List<Double> data = new List<Double>();
         List<String> labels = new List<String>();
 
-        printChart=true;
         chartData='\'Month\', \'Weight\', {role: \'style\'}]';
           
         //We have to use Dynamic SOQL here because the colon prevents the months variable from being concatenated:
@@ -361,7 +349,6 @@ public class BlubberPatrolCharts{
         List<String> data = new List<String>();
         List<String> labels = new List<String>();
 
-        printChart=true;
         chartData='\'Month\', \'Weight\', {role: \'style\'}]';
         
         //We have to use Dynamic SOQL here because the colon prevents the months variable from being concatenated:
@@ -400,7 +387,6 @@ public class BlubberPatrolCharts{
         if (weeks>data.size()){startAt=0;} else {startAt=data.size()-weeks;}
         for (integer i=startAt; i<data.size(); i++) {chartData+=',[\''+labels[i]+'\','+data[i]+', \'color: #1798c1\']';}
         if (chartData.endsWith(']')){chartData=chartData.left(chartData.length()-1);} 
-        system.debug('chartData = ' + chartData);
         setChartOptions('Weekly Weight'); 
     }
 
@@ -491,7 +477,6 @@ public class BlubberPatrolCharts{
         string sql;
         Date tempDate;
         
-        printChart=true;
         chartData='\'Day\', \'Weight\', {role: \'style\'}]';
           
         sql='Select Date__c, Weight__c FROM Weight__c Where (Date__c >= LAST_N_DAYS:' + days + ') and (Weight__c > 0) Order By Date__c';
@@ -501,9 +486,7 @@ public class BlubberPatrolCharts{
         for (Weight__c rec : results) {
             tempDate=rec.Date__c;
             chartData += ', [\'' + monthName(tempDate.month()) + ' ' + tempDate.day() + '\', ' + rec.Weight__c + ', \'color: #1798c1\']'; //Salesforce blue color.
-            system.debug(' chartData = ' + chartData);
         }
-
         if (chartData.endsWith(']')){chartData=chartData.left(chartData.length()-1);} //Remove the last square bracket since it will be added in the JavaScript.
 
         setChartOptions('Daily Weight');

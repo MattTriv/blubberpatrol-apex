@@ -3,25 +3,7 @@
     <!-- Google Visualization API code. No JavaScript code is needed for the original Chart API. -->
 	<script type="text/javascript" src="https://www.google.com/jsapi"></script> <!-- Load the AJAX API -->
 	<script type="text/javascript">
-    google.load('visualization', '1.0', {'packages':['corechart']}); // Load the Visualization API and the chart package.
-
-    // Set a callback to run when the Google Visualization API is loaded.
-    google.setOnLoadCallback(drawChart);
-
-    // The callback will always execute, but will only draw a chart when the Apex controller sets printChart to true.
-	function drawChart() {
-        //We can't check the length of !chartData because it has embedded quotes that screw things up when you try to do anything with it.
-        //Instead, we use a boolean !printChart, though it gets cast as a string here, which is easy enough to handle.
-        //Getting this syntax right was very tricky, so don't even think about modifying it.
-        var printChart = '{!printChart}';
-        //alert("Print chart = " + printChart);
-        if (printChart == 'false') {return;}
-        //alert("chartData={!chartData}");
-        var data = google.visualization.arrayToDataTable([[{!chartData}]]);
-		var options = {{!chartOptions}};
-		var chart = new google.visualization.ColumnChart(document.getElementById('chart_div1'));
-		chart.draw(data, options);
-    }
+        google.load('visualization', '1.0', {'packages':['corechart']}); // Load the Visualization API and the chart package.   
 	</script>
     
     <!-- 
@@ -67,8 +49,8 @@
                             </apex:panelGroup>
                             <apex:panelGroup>
                                 <div align="Center"> <!-- We need this Div to center the button. -->
-                                    <apex:commandButton action="{!makeChart}" value="Make Chart"/>
-                                    <!-- <apex:commandButton action="{!makeChart}" value="Make Chart" rerender="Charts"/> -->
+                                    <!-- <apex:commandButton action="{!makeChart}" value="Make Chart"/> -->
+                                    <apex:commandButton action="{!makeChart}" value="Make Chart" rerender="Charts"/>
                                 </div>
                             </apex:panelGroup>                            
                         </apex:panelGrid>
@@ -79,10 +61,12 @@
                         <apex:image url="{!chartURL}" />
                         <div id="chart_div1"></div>
                         <script type="text/javascript">
-                            // Any js placed here will be fired when output panel is rerendered
+                            // Any JS placed here will be fired when the output panel is rerendered.
                             (function(){
-                                //drawChart();
-                                //alert("drawChart() called.")
+                                var data = google.visualization.arrayToDataTable([[{!chartData}]]);
+                                var options = {{!chartOptions}};
+                                var chart = new google.visualization.ColumnChart(document.getElementById('chart_div1'));
+                                chart.draw(data, options);
                             })();
                         </script>
                     </apex:outputPanel>

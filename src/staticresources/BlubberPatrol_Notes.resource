@@ -1,4 +1,4 @@
- Resume on: chart Ajaxing, update tests, then a v1.0 deployment, and then a Lightening version of BP.
+ Resume on: hiding empty div, update tests, then a v1.0 deployment, and then a Lightning version of BP.
 
 To Do:
 * If we extend the BP CRUD controller, we could have the data entry on the same page as the charts.
