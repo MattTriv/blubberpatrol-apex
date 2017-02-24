@@ -10,7 +10,7 @@ private class TestBP {
 		con.numberOfDailyBars=7;
 		con.UpdateStatus();
 		string s=con.statusValue;
-		System.assertEquals('Ready to make daily chart.', s);
+		System.assertEquals('Please enter 1 to 60 days.', s);
 		//Don't know why this doesn't work:
 		//con.chartDatapoint cd = new con.chartDatapoint();
 		//cd.weight=150;

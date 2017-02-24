@@ -1,4 +1,13 @@
- Resume on: hiding empty div, update tests, then a v1.0 deployment, and then a Lightning version of BP.
+ Resume on: packaging. Then a Lightning version of BP.
+
+To Do - Packaging
+1) We can't package data, so use this mechanism to create sample data:
+	https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_install_handler.htm
+2) Sign up for a second dev org to test deployment. You can have as many dev orgs as you want.
+3) We made a package named "BlubberPatrol" in Setup -> Create -> Packages. Need to update it after adding sample-data code?
+4) Make a screenshot, and figure out how to add it to GitHub.
+5) Announced the app on LinkedIn & Slack. Ask for help with the text inputs being to far from the radiobuttons?
+
 
 To Do:
 * If we extend the BP CRUD controller, we could have the data entry on the same page as the charts.
@@ -23,12 +32,7 @@ Deploying:
 3) This Heroku app will allow a user to deploy BP from GitHub to their SFDC org: https://andyinthecloud.com/2013/09/24/deploy-direct-from-github-to-salesforce/
 
 Bad Ideas:
-1) See if we can write a trigger that will load the chart page after a new weight-value is entered via the CRUD. This is a bad idea because the a trigger might be fired with multiple objects, like when using the Data Loader (I think). So, I don't think that the compiler will let you write such a thing.
-
-*** Issue: Ajax Updates for Charts ***
-Updating the old charts without a page load works fine. However, the new charts are a problem. I think that this code: 
-var data = google.visualization.arrayToDataTable([[{!chartData}]]);
-...gets resolved with fresh data only when the page loads. If you call drawChart() without a page load, it draws the same chart because the new chartData value calculated by the controller hasn't been copied over. To fix it, we have to get chartData updated someplace other than the top of the page. We may also have to refactor makeChart() to not return a PageReference. This is tricky and time-consuming, but we are learning more deeply about JavaScript, Ajax, and how controllers interact with pages.
+1) See if we can write a trigger that will load the chart page after a new weight-value is entered via the CRUD. This is a bad idea because the trigger might be fired with multiple objects, like when using the Data Loader (I think). So, I don't think that the compiler will let you write such a thing.
 
 *** Issue: Setting the Focus ***
 We want the last inputText field used to keep the focus after a chart is made. The user may be experimenting with different numbers of bars, so it would be nice if they could type a number, press return, see the chart, type another number, press return, see another chart, etc. Right now, using autofocus only works when the page is intially loaded. VF ignores it after

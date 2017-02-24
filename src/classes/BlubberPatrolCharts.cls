@@ -84,6 +84,16 @@ public class BlubberPatrolCharts{
         decimal x, w;
         List<string> elements = new List<string>();
 
+        // For the old API, we build a string of data & options. We also build a string for the new API, 
+        // however, it is a string of array elements, and the syntax is much more tricky. Example:
+        //
+        // ['Year', 'Weight', {role: 'style'}], ['2015', 152.38, 'color: #1798c1'], ['2016', 148.80, 'color: #1798c1'], ['2017', 149.86, 'color: #1798c1']
+        //
+        // The first element is column headings. Elements are enclosd with square brackets and delimited by commas.
+        // The square brackets will cause JavaScript to evaluate the string as a set of array elements when it passes
+        // the string to the API. Because of this, you can't put the string into a variable and then pass it to the
+        // API. Your JS can only touch it once. We also have to escape the quotes in Apex to get them into the string:
+
         chartData='\'Year\', \'Weight\', {role: \'style\'}]';
 
         //Using LIMIT gets us the first n records, when we want the most-recent instead. Using DESC gets them, but in the 
@@ -100,11 +110,11 @@ public class BlubberPatrolCharts{
             elements.add('[\'' + year + '\', ' + w + ', \'color: #1798c1\']'); //Salesforce blue color.)
         }
 
-        for(integer i=elements.size()-1; i>=0; i--) {chartData+=', '+elements[i];} //Add to data string in reverse order.
+        for(integer i=elements.size()-1; i>=0; i--) {chartData += ', ' + elements[i];} //Add to chartData in reverse order.
 
-        //Remove the last square bracket. We leave off the first and last brackets because they are added on the VF page.
+        //Remove the last square bracket. We leave off the first and last brackets because they are added on the VF page:
         if (chartData.endsWith(']')){chartData=chartData.left(chartData.length()-1);} 
-
+        
         setChartOptions('Yearly Weight');
     }
 
@@ -128,7 +138,7 @@ public class BlubberPatrolCharts{
             //Can't push until there is at least one element in the list:            
             if (theData.size()==0) theData.add(cd); else theData.add(0,cd);
         }
-        formatChartOld(theData,'Yearly Chart');
+        formatChartOld(theData,'Yearly Weight');
     }
 
     private void makeQuarterlyChartNew(integer quarters){ 
@@ -222,7 +232,7 @@ public class BlubberPatrolCharts{
             }
             theData.add(cd);
         }
-        formatChartOld(theData,'Quarterly Chart');
+        formatChartOld(theData,'Quarterly Weight');
     }
     
     private void makeMonthlyChartNew(integer months){   
