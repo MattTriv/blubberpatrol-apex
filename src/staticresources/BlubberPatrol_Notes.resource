@@ -1,19 +1,22 @@
- Resume on: packaging/trying to get debug messages in BP install test code. Then a Lightning version of BP.
+ Resume on: making a test method for our trigger, then packaging install-script work-around. Then a Lightning version of BP.
 
 To Do - Packaging
-1) We can't package data, so use this mechanism to create sample data:
-	https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_install_handler.htm
-2) Sign up for a second dev org to test deployment. You can have as many dev orgs as you want.
-3) We made a package named "BlubberPatrol" in Setup -> Create -> Packages. Need to update it after adding sample-data code?
+0) Figure out how to put our VF page on the Weight tab, or open it automatically. Right now, we have to use Setup to find it.
+0) We can't announce this app without exception handling.
+0) Freshen the dates after installing sample data?
+1) Send email from install method?
+2) Write up some release notes, put them on Triv.com, and add the URL to the final package upload.
+3) 
 4) Make a screenshot, and figure out how to add it to GitHub.
 5) Announce the app on LinkedIn & Slack. Ask for help with the text inputs being to far from the radiobuttons?
-6) Somebody mentioned that you can designate a package as "beta" so make sure to do that on the first one.
+6) 
 7) The Data Loader only seems to be able to export in CSV format, but we need JSON format to import a static resource file during the import process. So, convert the CSV file with this website: http://www.convertcsv.com/csv-to-json.htm
+8) Package Description: This is a practice app that I wrote to learn Apex/Visualforce. It consists of a custom object where you can enter your weight each day, and a Visualforce page to make charts of various time periods using the Google Chart & Visualization APIs.
 
 
 To Do:
 * If we extend the BP CRUD controller, we could have the data entry on the same page as the charts.
-* Think of a way to add a trigger since we need to practice writing one.
+* Think of a way to add a trigger since we need to practice writing one. Idea: a trigger to prevent the user from entering more than one record per day.
 * Replace radiobuttons with pushbuttons for easier layout?
 * See if we can stop the radiobutton text from wrapping. It may be possible with white-space:nowrap
 * Fix the thing where SOQL gives us n+1 weeks. Just discard the first element.
