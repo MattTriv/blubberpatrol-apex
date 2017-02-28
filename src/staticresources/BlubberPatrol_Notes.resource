@@ -1,15 +1,19 @@
- Resume on: making a test method for our trigger, then packaging install-script work-around. Then a Lightning version of BP.
+Resume: On smoothing out FirstRun code. Then a Lightning version of BP.
+Resume: Is the 5-second delay too long? Should we have the user click a button instead?
+Resume: Can we disable the page for the first 5 seconds, and then re-enable after the load?
+Resume: Can we check for available space?
+Resume: The daily chart needs to start from the last day in the db, not today() and proceed backward. It is losing bars now.
 
 To Do - Packaging
 0) Figure out how to put our VF page on the Weight tab, or open it automatically. Right now, we have to use Setup to find it.
-0) We can't announce this app without exception handling.
+0) We can't announce this app without exception handling. We only have two Try/Catch statements in the trigger test method.
 0) Freshen the dates after installing sample data?
 1) Send email from install method?
 2) Write up some release notes, put them on Triv.com, and add the URL to the final package upload.
 3) 
 4) Make a screenshot, and figure out how to add it to GitHub.
 5) Announce the app on LinkedIn & Slack. Ask for help with the text inputs being to far from the radiobuttons?
-6) 
+6) We are exceeding the SOQL limit when we run tests, but it doesn't prevent us from passing.
 7) The Data Loader only seems to be able to export in CSV format, but we need JSON format to import a static resource file during the import process. So, convert the CSV file with this website: http://www.convertcsv.com/csv-to-json.htm
 8) Package Description: This is a practice app that I wrote to learn Apex/Visualforce. It consists of a custom object where you can enter your weight each day, and a Visualforce page to make charts of various time periods using the Google Chart & Visualization APIs.
 

@@ -12,8 +12,10 @@ public class BlubberPatrolCharts{
     public string chartData {get;set;}
     public string chartOptions {get;set;}
     public string whichAPI {get;set;}
+    public string pollerOn {get;set;}
     
-    @TestVisible public class chartDatapoint {
+    @TestVisible 
+    public class chartDatapoint {
         //Holds datapoints and axis labels for the old API..
         public double weight {get;set;}
         public string date1  {get;set;}
@@ -30,10 +32,11 @@ public class BlubberPatrolCharts{
         numberOfYearlyBars=7;
         whichAPI='oldAPI';
 		updateStatus();
+        pollerOn='true';
         makeChart();
     }
     
-    //The next two methods are "Action Methods" which are triggered by buttons, links, etc. And controls tagged with apex:actionSupport.
+    //The next three methods are "Action Methods" which are triggered by buttons, links, etc. And controls tagged with apex:actionSupport.
 	public void updateStatus(){
         if (selectedRadioVal=='dailyChart'){statusValue='Please enter 1 to 60 days.';}
         if (selectedRadioVal=='weeklyChart') {statusValue='Please enter 1 to 52 weeks.';}
@@ -41,6 +44,26 @@ public class BlubberPatrolCharts{
         if (selectedRadioVal=='quarterlyChart'){statusValue='Please enter 1 to 36 quarters.';}
         if (selectedRadioVal=='yearlyChart') {statusValue='Please enter 1 to 10 years.';}
 	}
+
+    public void checkData() {
+        // We need a way to automatically load the sample data into the db on FirstRun.
+        // Since an unmanaged package cannot use the installHandler interface, this is our workaround.
+        // And since DML cannot be used in the constructor, we needed antoher mechanism to trigger it.
+        // The actionPoller on the VF page fires 5 seconds after the page loads, and triggers this
+        // method. I would prefer 1 second, but 5 is the minimum.
+        pollerOn='false'; //Turn the poller off immediately.
+        integer n = [Select count() From Weight__c];
+        if (n==0) {
+            statusValue='Loading sample data...';
+            StaticResource sr = [select Body from StaticResource where Name = 'BPData'];
+            List<Weight__c> theData = (List<Weight__c>) JSON.deserialize(sr.Body.toString(), List<Weight__c>.class);
+            insert theData;
+        } else {    
+            statusValue='There are ' + n + ' records in the db.';
+        }
+        statusValue='Ready.';
+        makeChart(); 
+    }
 
     public PageReference makeChart(){
         chartURL=''; chartData=''; chartOptions='';
@@ -83,7 +106,6 @@ public class BlubberPatrolCharts{
         string s, year;
         decimal x, w;
         List<string> elements = new List<string>();
-
         // For the old API, we build a string of data & options. We also build a string for the new API, 
         // however, it is a string of array elements, and the syntax is much more tricky. Example:
         //
@@ -608,7 +630,8 @@ public class BlubberPatrolCharts{
         chartOptions += '\'chartArea\':         {left: \'10%\', top: \'10%\', width: \'90%\', height: \'75%\'}';  
     }
 
-    @TestVisible private string monthName(integer monthNo) {
+    @TestVisible 
+    private string monthName(integer monthNo) {
         if (monthNo==1) return 'Jan';
         if (monthNo==2) return 'Feb';
         if (monthNo==3) return 'Mar';

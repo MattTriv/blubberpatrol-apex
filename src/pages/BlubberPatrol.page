@@ -15,7 +15,7 @@
 	<apex:form >
 		<apex:pageBlock title="BlubberPatrol">
             <apex:panelGrid columns="2">
-                <apex:panelGroup>
+                <apex:panelGroup >
                     <apex:panelGrid columns="2" border="0" id="theGrid" width="100%">
                         <apex:panelGroup id="readioGroup">
                			  <apex:selectRadio value="{!selectedRadioVal}" id="chooseChart" layout="pageDirection">
@@ -35,11 +35,14 @@
                             <apex:input value="{!numberOfQuarterlyBars}" type="number" html-min="1" html-max="36" style="width: 40px; margin-bottom:4px;"/><br />                       
                 		    <apex:input value="{!numberOfYearlyBars}"    type="number" html-min="1" html-max="10" style="width: 40px; margin-bottom:4px;"/><br />                       
                 	    </apex:panelGroup>
-                        <apex:panelGrid>
-                            <apex:panelGroup>
-                                <!-- the outputPanel demarks the part of the page to receive Ajax updates. -->
+                        <apex:panelGrid >
+                            <apex:panelGroup >
+                                <!--The outputPanel demarks a part of the page to receive Ajax updates. 
+                                    The actionPoller fires once 5 seconds after the page loads. It calls checkData() to
+                                    see if there is data present, and is turned off. See the notes in the controller -->
                                 <apex:outputpanel id="Status">
                                     <apex:outputText value="{!statusValue}"></apex:outputText>
+                                    <apex:actionPoller action="{!checkData}" rerender="Status" interval="5" enabled="{!pollerOn}"></apex:actionPoller> 
                                 </apex:outputpanel>
                                 <br/><br/><hr/><br/>
                                 <apex:selectRadio value="{!whichAPI}" id="whichAPI" layout="pageDirection">
@@ -47,7 +50,7 @@
                                     <apex:selectOption itemvalue="newAPI" itemlabel="Use Google Visualization API"/>
                                 </apex:selectRadio>
                             </apex:panelGroup>
-                            <apex:panelGroup>
+                            <apex:panelGroup >
                                 <div align="Center"> <!-- We need this Div to center the button. -->
                                     <!-- <apex:commandButton action="{!makeChart}" value="Make Chart"/> -->
                                     <apex:commandButton action="{!makeChart}" value="Make Chart" rerender="Charts"/>
@@ -56,7 +59,7 @@
                         </apex:panelGrid>
                     </apex:panelGrid>
                 </apex:panelGroup>
-                <apex:panelGroup>
+                <apex:panelGroup >
                     <apex:outputPanel id="Charts">
                         <apex:image url="{!chartURL}" /> <!-- Don't need to hide when using the new API. -->
                         <div id="chart_div1"></div>
