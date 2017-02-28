@@ -1,5 +1,33 @@
 @IsTest(SeeAllData=true)
 private class TestBP {
+
+	@isTest static void test_trigger(){
+		//First, add a record. Since we might have SeeAllData on, and we might have all of our 
+		//historical data loaded at some point, we need to create a date that won't exist by
+		//subtracting 40 years from today. I don't think that you can make a date in the future:
+		Weight__c w = new Weight__c();
+		w.Date__c=Date.today().addYears(-30);
+		w.Weight__c=150;
+		Test.startTest();
+		try {
+			insert w; //Fires the trigger, and it should not throw an error.
+		} catch (exception e) {
+			System.debug(' Error from first trigger insert = ' + e);
+		}
+
+		//Now, add another record with the same date, and the trigger should throw an error:
+		try {
+			//We can't reuse the w object because it will have an ID assigned and that will cause an error.
+			Weight__c ww = new Weight__c();
+			ww.Date__c=w.Date__c;
+			ww.Weight__c=151; //Just change the weight and leave the date the same.
+			insert ww;
+		} catch (exception e) {
+			System.debug(' Error from second trigger insert = ' + e);
+			System.assert(e.getMessage().contains('already exists'));
+		}
+		Test.stopTest();
+	}
 	
 	@isTest static void test_Page() {
 		PageReference pageRef = Page.BlubberPatrol;
