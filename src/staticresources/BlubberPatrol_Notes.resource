@@ -19,8 +19,8 @@ To Do - Packaging
 
 
 To Do:
+* Chart methods need to return if there is no data returned by the SOQL query.
 * If we extend the BP CRUD controller, we could have the data entry on the same page as the charts.
-* Think of a way to add a trigger since we need to practice writing one. Idea: a trigger to prevent the user from entering more than one record per day.
 * Replace radiobuttons with pushbuttons for easier layout?
 * See if we can stop the radiobutton text from wrapping. It may be possible with white-space:nowrap
 * Fix the thing where SOQL gives us n+1 weeks. Just discard the first element.

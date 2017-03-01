@@ -68,31 +68,35 @@ public class BlubberPatrolCharts{
     public PageReference makeChart(){
         chartURL=''; chartData=''; chartOptions='';
         
-        if (selectedRadioVal=='dailyChart')
-            if (whichAPI == 'oldAPI')
-                makeDailyChartOld(numberOfDailyBars);
-            else
-                makeDailyChartNew(numberOfDailyBars);
-        if (selectedRadioVal=='weeklyChart')	
-            if (whichAPI == 'oldAPI')
-                makeWeeklyChartOld(integer.ValueOf(numberOfWeeklyBars));
-            else
-                makeWeeklyChartNew(integer.ValueOf(numberOfWeeklyBars));
-        if (selectedRadioVal=='monthlyChart')	
-            if (whichAPI == 'oldAPI') 
-                makeMonthlyChartOld(Integer.ValueOf(numberOfMonthlyBars));
-            else
-                makeMonthlyChartNew(Integer.ValueOf(numberOfMonthlyBars));
-        if (selectedRadioVal=='quarterlyChart')	
-            if (whichAPI == 'oldAPI') 
-                makeQuarterlyChartOld(Integer.ValueOf(numberOfQuarterlyBars));
-            else
-                makeQuarterlyChartNew(Integer.ValueOf(numberOfQuarterlyBars));
-        if (selectedRadioVal=='yearlyChart')
-            if (whichAPI == 'oldAPI') 
-                makeYearlyChartOld(Integer.ValueOf(numberOfYearlyBars));
-            else
-                makeYearlyChartNew(Integer.ValueOf(numberOfYearlyBars));
+        Try{
+           if (selectedRadioVal=='dailyChart')
+              if (whichAPI == 'oldAPI')
+                  makeDailyChartOld(numberOfDailyBars);
+              else
+                 makeDailyChartNew(numberOfDailyBars);
+            if (selectedRadioVal=='weeklyChart')	
+                if (whichAPI == 'oldAPI')
+                    makeWeeklyChartOld(integer.ValueOf(numberOfWeeklyBars));
+                else
+                    makeWeeklyChartNew(integer.ValueOf(numberOfWeeklyBars));
+            if (selectedRadioVal=='monthlyChart')	
+                if (whichAPI == 'oldAPI') 
+                    makeMonthlyChartOld(Integer.ValueOf(numberOfMonthlyBars));
+                else
+                    makeMonthlyChartNew(Integer.ValueOf(numberOfMonthlyBars));
+            if (selectedRadioVal=='quarterlyChart')	
+                if (whichAPI == 'oldAPI') 
+                    makeQuarterlyChartOld(Integer.ValueOf(numberOfQuarterlyBars));
+                else
+                    makeQuarterlyChartNew(Integer.ValueOf(numberOfQuarterlyBars));
+            if (selectedRadioVal=='yearlyChart')
+                if (whichAPI == 'oldAPI') 
+                    makeYearlyChartOld(Integer.ValueOf(numberOfYearlyBars));
+                else
+                    makeYearlyChartNew(Integer.ValueOf(numberOfYearlyBars));
+        } catch (exception e) {
+            statusValue='Something went wrong.';
+        }
 
         Return null;
         //This method returns a PageReference, which is a URL.
@@ -259,9 +263,9 @@ public class BlubberPatrolCharts{
     
     private void makeMonthlyChartNew(integer months){   
         decimal totalWeight=0.0; decimal x=0.0; decimal w=0.0;
-        string s, sql, monthYear, last, displayDate;
+        string s, sql, thisMonthYear, lastMonthYear, displayDate;
         integer datapoints=0; integer startAt=0;
-        DateTime dt=DateTime.newInstance(2017,01,01);
+        Date tempDate;
         List<Double> data = new List<Double>();
         List<String> labels = new List<String>();
 
@@ -272,23 +276,26 @@ public class BlubberPatrolCharts{
         
         //Put the results into a list and aggregate manually:
         List<Weight__c> results = Database.query(sql);
-        last=string.valueOf(results[0].Date__c.month()) + string.valueOf(results[0].Date__c.year());
+        Weight__c lastRec=results[0];
+        lastMonthYear=string.valueOf(lastRec.Date__c.month()) + string.valueOf(lastRec.Date__c.year());
+        tempDate=lastRec.Date__c;
+        displayDate=monthName(tempDate.month());  
         for (Weight__c rec : results) {
-            monthYear=string.valueOf(rec.Date__c.month()) + string.valueOf(rec.Date__c.year());
-            dt=rec.Date__c;
-            displayDate=dt.format('MMM');
-            if (monthYear<>last){
+            thisMonthYear=string.valueOf(rec.Date__c.month()) + string.valueOf(rec.Date__c.year());
+            if (thisMonthYear<>lastMonthYear){
+                //We are on the first day of the next month, so we need to save totals for the previous month.
                 x=totalWeight/datapoints;
                 w=x.setScale(2);            
                 data.add(w);
                 labels.add(displayDate);
-                last=monthYear;
+                lastMonthYear=thisMonthYear;
                 datapoints=0;
                 totalWeight=0;
-            } else {
-                datapoints++;
-                totalWeight += rec.Weight__c;
             }
+            datapoints++;
+            totalWeight += rec.Weight__c;
+            tempDate=rec.Date__c;
+            displayDate=monthName(tempDate.month());   
         }
         x=totalWeight/datapoints;
         w=x.setScale(2);
@@ -304,10 +311,10 @@ public class BlubberPatrolCharts{
 
     private void makeMonthlyChartOld(integer months){    
 		decimal totalWeight=0.0; decimal x=0.0; decimal w=0.0;
-        string s, sql, monthYear, last, displayDate;
+        string s, sql, thisMonthYear, lastMonthYear, displayDate;
         boolean skip=false;
         integer datapoints=0; integer startAt=0; integer skipNo=0;
-        DateTime dt=DateTime.newInstance(2017,01,01);
+        Date tempDate;
         List<Double> data = new List<Double>();    //These 3 lists are used in the first pass of data.
         List<String> labels = new List<String>();  //These 3 lists are used in the first pass of data.
         List<String> labels2 = new List<String>(); //These 3 lists are used in the first pass of data.
@@ -319,30 +326,33 @@ public class BlubberPatrolCharts{
         
         //In the first pass, we put the results into a list and aggregate manually:
 		List<Weight__c> results = Database.query(sql);
-        last=string.valueOf(results[0].Date__c.month()) + string.valueOf(results[0].Date__c.year());
+        Weight__c lastRec=results[0];
+        lastMonthYear=string.valueOf(lastRec.Date__c.month()) + string.valueOf(lastRec.Date__c.year());
+        tempDate=lastRec.Date__c;
+        displayDate=monthName(tempDate.month());       
         for (Weight__c rec : results) {
-            monthYear=string.valueOf(rec.Date__c.month()) + string.valueOf(rec.Date__c.year());
-            dt=rec.Date__c;
-            displayDate=dt.format('MMM');
-            if (monthYear<>last){
+            thisMonthYear=string.valueOf(rec.Date__c.month()) + string.valueOf(rec.Date__c.year());
+            if (thisMonthYear<>lastMonthYear){
+                //We are on the first day of the next month, so we need to save totals for the previous month.
               	x=totalWeight/datapoints;
                 w=x.setScale(2);            
                 data.add(w);
                 labels.add(displayDate);
-                if (displayDate=='Jan') labels2.add(dt.format('YYYY')); else labels2.add('');
-                last=monthYear;
+                if (displayDate=='Jan') labels2.add(string.valueOf(tempDate.year())); else labels2.add('');
+                lastMonthYear=thisMonthYear;
                 datapoints=0;
                 totalWeight=0;
-        	} else {
-            	datapoints++;
-                totalWeight += rec.Weight__c;
-           	}
+        	}
+            datapoints++;
+            totalWeight += rec.Weight__c;
+            tempDate=rec.Date__c;
+            displayDate=monthName(tempDate.month());   
 		}
         x=totalWeight/datapoints;
         w=x.setScale(2);
         data.add(w);
         labels.add(displayDate);
-        if (displayDate=='Jan') labels2.add(dt.format('YYYY')); else labels2.add('');
+        if (displayDate=='Jan') labels2.add(string.valueOf(tempDate.year())); else labels2.add('');
 
         //In the second pass, we figure out which labels to print. If the user specifies more bars than we have data for,
         //print them all. Otherwise, print just the number they specified:
@@ -501,7 +511,6 @@ public class BlubberPatrolCharts{
             }
             theData.add(cd);  
         }
-
         formatChartOld(theData,'Weekly Weight');
     }
 
@@ -520,7 +529,6 @@ public class BlubberPatrolCharts{
             chartData += ', [\'' + monthName(tempDate.month()) + ' ' + tempDate.day() + '\', ' + rec.Weight__c + ', \'color: #1798c1\']'; //Salesforce blue color.
         }
         if (chartData.endsWith(']')){chartData=chartData.left(chartData.length()-1);} //Remove the last square bracket since it will be added in the JavaScript.
-
         setChartOptions('Daily Weight');
     }
 
@@ -550,7 +558,6 @@ public class BlubberPatrolCharts{
             if (dayNumber=='1') {cd.date2=(monthName(tempDate.month()));} else {cd.date2='';}
             theData.add(cd);
         }
-
         formatChartOld(theData, 'Daily Weight');
     }
 
