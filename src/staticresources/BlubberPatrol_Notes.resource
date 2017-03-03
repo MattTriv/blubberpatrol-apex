@@ -1,12 +1,58 @@
 Resume: On smoothing out FirstRun code. Then a Lightning version of BP.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Resume: WHEN makeChart() IS CALLED FROM THE CONSTRUCTOR, IT WORKS FINE. BUT WHEN IT IS CALLED FROM checkData() IT
+Resume: RUNS, MAKES A CORRECT API STRING, BUT THE CHART FAILS TO SHOW. THIS IS ONLY ON FIRST RUN. AJAX IS NOT TRIGGERING
+Resume: AN UPDATE OF THE CHART DIV.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Resume: Is the 5-second delay too long? Should we have the user click a button instead?
 Resume: Can we disable the page for the first 5 seconds, and then re-enable after the load?
 Resume: Can we check for available space?
+Resume: We might be able to fire faster than 5 seconds with some JavaScript code. See this page:
+Resume: http://stackoverflow.com/questions/16791915/want-time-delay-before-function-call-in-apex-code
 Resume: The daily chart needs to start from the last day in the db, not today() and proceed backward. It is losing bars now.
 
 To Do - Packaging
 0) Figure out how to put our VF page on the Weight tab, or open it automatically. Right now, we have to use Setup to find it.
-0) We can't announce this app without exception handling. We only have two Try/Catch statements in the trigger test method.
+0) Right now, we only have exception handling in the trigger test method, and in makeChart().
 0) Freshen the dates after installing sample data?
 1) Send email from install method?
 2) Write up some release notes, put them on Triv.com, and add the URL to the final package upload.

@@ -13,6 +13,7 @@ public class BlubberPatrolCharts{
     public string chartOptions {get;set;}
     public string whichAPI {get;set;}
     public string pollerOn {get;set;}
+    public string showProgress {get;set;}
     
     @TestVisible 
     public class chartDatapoint {
@@ -25,7 +26,7 @@ public class BlubberPatrolCharts{
     //Constructor:
     public BlubberPatrolCharts(){
         selectedRadioVal='dailyChart'; //Set the default radio button. There is no "checked" attribute like in HTML.
-        numberOfDailyBars=7;
+        numberOfDailyBars=30;
         numberOfWeeklyBars=20;
         numberOFMonthlyBars=12;
         numberOfQuarterlyBars=4;
@@ -33,7 +34,16 @@ public class BlubberPatrolCharts{
         whichAPI='oldAPI';
 		updateStatus();
         pollerOn='true';
-        makeChart();
+        showProgress='display: none;';
+        integer n = [Select count() From Weight__c];
+        if (n==0) {
+            // This is a new install, so show the progress message, and
+            // wait for the poller to call checkData.
+            showProgress='display: block;';
+        } else { 
+            showProgress='display: none;';
+            makeChart();
+        }
     }
     
     //The next three methods are "Action Methods" which are triggered by buttons, links, etc. And controls tagged with apex:actionSupport.
@@ -54,15 +64,20 @@ public class BlubberPatrolCharts{
         pollerOn='false'; //Turn the poller off immediately.
         integer n = [Select count() From Weight__c];
         if (n==0) {
+            //showProgress='display: block;'; // This doesn't work here because the data install too fast.
             statusValue='Loading sample data...';
             StaticResource sr = [select Body from StaticResource where Name = 'BPData'];
             List<Weight__c> theData = (List<Weight__c>) JSON.deserialize(sr.Body.toString(), List<Weight__c>.class);
             insert theData;
+            showProgress='display: none;';
+            statusValue='Sample data loaded.';
+            // Leave these debug statements in release versions.
+            System.debug(' - checkData() imported sample data');
+            makeChart();
         } else {    
-            statusValue='There are ' + n + ' records in the db.';
+            // One of the drawbacks of this method is that we get double the number of debug logs.
+            System.debug(' - checkData() did not have to import sample data.');
         }
-        statusValue='Ready.';
-        makeChart(); 
     }
 
     public PageReference makeChart(){
@@ -100,7 +115,7 @@ public class BlubberPatrolCharts{
 
         Return null;
         //This method returns a PageReference, which is a URL.
-        //By returning null, I think we are telling the browser to stay on the same page.
+        //By returning null, we are just telling the browser to refresh the page.
         //This would send the user to Google:
         //PageReference pageRef = new PageReference('http://www.google.com');
         //return pageRef;
