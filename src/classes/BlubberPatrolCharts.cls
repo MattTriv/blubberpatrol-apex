@@ -12,12 +12,13 @@ public class BlubberPatrolCharts{
     public string chartData {get;set;}
     public string chartOptions {get;set;}
     public string whichAPI {get;set;}
+    // The next two properties are for the installation process:
     public string pollerOn {get;set;}
     public string showProgress {get;set;}
     
     @TestVisible 
     public class chartDatapoint {
-        //Holds datapoints and axis labels for the old API..
+        //Holds datapoints, and axis labels for the old API in date2.
         public double weight {get;set;}
         public string date1  {get;set;}
         public string date2  {get;set;}
@@ -33,15 +34,17 @@ public class BlubberPatrolCharts{
         numberOfYearlyBars=7;
         whichAPI='oldAPI';
 		updateStatus();
-        pollerOn='true';
         showProgress='display: none;';
         integer n = [Select count() From Weight__c];
         if (n==0) {
-            // This is a new install, so show the progress message, and
-            // wait for the poller to call checkData.
+            // This is a new install, so show the progress message, switch
+            // on the poller, and wait for it to call makeData().
             showProgress='display: block;';
+            pollerOn='true';
         } else { 
+            // This is a regular launch, so just make the default chart.
             showProgress='display: none;';
+            pollerOn='false';
             makeChart();
         }
     }
@@ -55,32 +58,30 @@ public class BlubberPatrolCharts{
         if (selectedRadioVal=='yearlyChart') {statusValue='Please enter 1 to 10 years.';}
 	}
 
-    public void checkData() {
-        // We need a way to automatically load the sample data into the db on FirstRun.
+    public void makeData() {
+        // We need a way to automatically load the sample data into the db during a new installation.
         // Since an unmanaged package cannot use the installHandler interface, this is our workaround.
         // And since DML cannot be used in the constructor, we needed antoher mechanism to trigger it.
         // The actionPoller on the VF page fires 5 seconds after the page loads, and triggers this
-        // method. I would prefer 1 second, but 5 is the minimum.
-        pollerOn='false'; //Turn the poller off immediately.
+        // method when the constructor doesn't find any data. I would prefer 1 second, but 5 is the minimum.
+        // Turn the poller off immediately; we never want it to fire more than once:
+        pollerOn='false'; 
+        // We don't need to check this again, but we just want to be extra vigilant against
+        // the possibility of a bug on the VF page creating duplicate data.
         integer n = [Select count() From Weight__c];
         if (n==0) {
-            //showProgress='display: block;'; // This doesn't work here because the data install too fast.
-            statusValue='Loading sample data...';
             StaticResource sr = [select Body from StaticResource where Name = 'BPData'];
             List<Weight__c> theData = (List<Weight__c>) JSON.deserialize(sr.Body.toString(), List<Weight__c>.class);
             insert theData;
             showProgress='display: none;';
-            statusValue='Sample data loaded.';
-            // Leave these debug statements in release versions.
-            System.debug(' - checkData() imported sample data');
             makeChart();
         } else {    
-            // One of the drawbacks of this method is that we get double the number of debug logs.
-            System.debug(' - checkData() did not have to import sample data.');
+            // If data is already present, then the app should work normally. So, no need to bother the user.
+            System.debug(' - makeData() did not have to import sample data. This should never happen.');
         }
     }
 
-    public PageReference makeChart(){
+    public void makeChart(){
         chartURL=''; chartData=''; chartOptions='';
         
         Try{
@@ -112,13 +113,6 @@ public class BlubberPatrolCharts{
         } catch (exception e) {
             statusValue='Something went wrong.';
         }
-
-        Return null;
-        //This method returns a PageReference, which is a URL.
-        //By returning null, we are just telling the browser to refresh the page.
-        //This would send the user to Google:
-        //PageReference pageRef = new PageReference('http://www.google.com');
-        //return pageRef;
     }
 
     private void makeYearlyChartNew(integer years){  

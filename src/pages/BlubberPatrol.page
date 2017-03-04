@@ -1,5 +1,5 @@
 <apex:page docType="html-5.0" controller="BlubberPatrolCharts">
-    <apex:stylesheet value="{!$Resource.BPStyle}" />
+    <apex:stylesheet value="{!$Resource.BPStyle}" /> <!-- Styling for our new-installation divs. -->
     
     <!-- Google Visualization API code. No JavaScript code is needed for the original Chart API. -->
 	<script type="text/javascript" src="https://www.google.com/jsapi"></script> <!-- Load the AJAX API -->
@@ -11,7 +11,7 @@
     We use a panelGrid with 2 columns. 
     In column 1 of the first row, is a nested panelGrid with 2 columns holding the radio buttons & number fields.
     In the second column are the charts.
-    In the second row are the API radios & command button
+    In the second row are the API radio buttons & command button
      -->
 	<apex:form >
 		<apex:pageBlock title="BlubberPatrol">
@@ -25,7 +25,7 @@
 							<apex:selectOption itemValue="monthlyChart" itemLabel="Monthly Chart"/>
                 			<apex:selectOption itemValue="quarterlyChart" itemLabel="Quarterly Chart"/>
                 			<apex:selectOption itemValue="yearlyChart" itemLabel="Yearly Chart"/>
-	                		<!-- the actionSupport component adds Ajax capabilities to our Status field. -->
+	                		<!-- the actionSupport component adds Ajax capabilities to our Status field below. -->
     	            		<apex:actionSupport event="onchange" rerender="Status" action="{!updateStatus}"/>                
 						  </apex:selectRadio>
                         </apex:panelGroup>
@@ -38,23 +38,10 @@
                 	    </apex:panelGroup>
                         <apex:panelGrid >
                             <apex:panelGroup >
-                                <!--The outputPanel demarks a part of the page to receive Ajax updates. 
-                                    The actionPoller fires once 5 seconds after the page loads. It calls checkData() to
-                                    see if there is data present, and is turned off. See the notes in the controller -->
+                                <!--The outputPanel demarks a part of the page to receive Ajax updates when a radiobutton
+                                    is clicked: -->
                                 <apex:outputpanel id="Status">
                                     <apex:outputText value="{!statusValue}"></apex:outputText>
-                                    <!-- This is used when installing the sample data on first-run. 
-                                         It is switched on & off by checkData(). -->
-                                    <div style="{!showProgress}">
-                                        <div class="popupBackground" />
-                                        <div class="popupPanel">
-                                            <table border="0" width="100%" height="100%">
-                                                <tr><td align="center"><p style="font-size: 14px"><b>Installing sample data...</b></p></td></tr>
-                                                <tr><td align="center"><img src="{!$Resource.BPWaitGIF}"/></td></tr>
-                                            </table>
-                                        </div>
-                                    </div>
-                                    <apex:actionPoller action="{!checkData}" rerender="Status" interval="5" enabled="{!pollerOn}"></apex:actionPoller>
                                 </apex:outputpanel>
                                 <br/><br/><hr/><br/>
                                 <apex:selectRadio value="{!whichAPI}" id="whichAPI" layout="pageDirection">
@@ -65,6 +52,8 @@
                             <apex:panelGroup >
                                 <div align="Center"> <!-- We need this Div to center the button. -->
                                     <apex:commandButton action="{!makeChart}" value="Make Chart" rerender="Charts"/>
+                                    <br/><br/><hr/><br/>
+                                    <a href="https://github.com/MattTriv/blubberpatrol-apex/blob/master/README.md" target="notes">Click here to read the project notes.</a>
                                 </div>
                             </apex:panelGroup>                            
                         </apex:panelGrid>
@@ -81,21 +70,36 @@
                                 var whichAPI='{!whichAPI}';
                                 var e = document.getElementById('chart_div1');
                                 if (whichAPI == 'newAPI') {
-                                    e.style.display = 'block' //Show the Div.
+                                    e.style.display = 'block' //Show the chart div.
                                     // Don't mess with this syntax! It won't work any other way:
                                     var data = google.visualization.arrayToDataTable([[{!chartData}]]);
                                     var options = {{!chartOptions}};
                                     var chart = new google.visualization.ColumnChart(e);
                                     chart.draw(data, options);
                                 } else {
-                                    e.style.display = 'none'; //Hide the Div.
+                                    e.style.display = 'none'; //Hide the chart div.
                                 }
                             })();
                         </script>
                     </apex:outputPanel>
+                    <apex:outputPanel id="Install">
+                        <!-- These divs & the actionPoller are used when installing the sample data during an installation. 
+                            The actionPoller fires once and calls makeData(). See the notes in the controller. -->
+                        <div style="{!showProgress}">
+                            <div class="popupBackground"></div>
+                            <div class="popupPanel">
+                                <table border="0" width="100%" height="100%">
+                                    <tr><td align="center"><p style="font-size: 14px"><b>Installing sample data...</b></p></td></tr>
+                                    <tr><td align="center"><img src="{!$Resource.BPWaitGIF}"/></td></tr>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- The actionPoller needs to rerender the Charts panel because it initiates the first chart
+                             in a new installation.-->
+                        <apex:actionPoller action="{!makeData}" rerender="Charts,Install" interval="5" enabled="{!pollerOn}"></apex:actionPoller>
+                    </apex:outputPanel>
                 </apex:panelGroup>
-            </apex:panelGrid>
+            </apex:panelGrid>            
         </apex:pageBlock>
     </apex:form>
-
 </apex:page>
