@@ -1,4 +1,4 @@
 # blubberpatrol-apex
 Apex/VisualForce implementation of BlubberPatrol.
 
-(src/staticresources/BPWaitGIF.resource)
+[Test](src/staticresources/BPWaitGIF.resource)
