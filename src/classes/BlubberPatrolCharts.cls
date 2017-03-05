@@ -151,6 +151,16 @@ public class BlubberPatrolCharts{
         if (chartData.endsWith(']')){chartData=chartData.left(chartData.length()-1);} 
         
         setChartOptions('Yearly Weight');
+
+/*        Weight__c ww = new Weight__c();
+        ww.Date__c = Date.today();
+        ww.Date__c=ww.Date__c.addDays(7);
+        System.debug(' - ww.Date__c = ' + ww.Date__c);
+        aggregateResult result = [Select max(Date__c) MaxDate from Weight__c];
+        System.debug(' - MaxDate = ' + result.get('MaxDate'));
+        Date d=Date.valueOf(result.get('MaxDate'));
+        System.debug(' d = ' + d);
+        System.debug(' Days to add = ' + d.daysBetween(Date.today()));*/
     }
 
     private void makeYearlyChartOld(integer years){    

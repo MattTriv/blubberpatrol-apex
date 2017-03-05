@@ -1,3 +1,5 @@
+Resume: Use the test code in makeYearlyChartNew() to freshen the data. It finds the correct number of days to add. It doesn't look like SOQL can update the entire table with one statement because it has no date-arithmatic column functions. So, we will have to pull down the entire table into a list, loop through updating the dates, and then update the table with a bulk update. Or loop through the list right after importing, and do the updates there, so that we will still only have the one insert operation.
+
 Strategy: Polish the package. Then a Lightning version of BP.
 Priority: Get "Resume Ready" so that we can jump on any plumb opportunities that pop-up as we continue to polish.
 Priority: First draft of README page on GitHub. Explanation of app, screenshot, known issues, etc.
