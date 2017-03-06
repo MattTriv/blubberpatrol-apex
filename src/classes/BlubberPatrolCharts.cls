@@ -72,6 +72,19 @@ public class BlubberPatrolCharts{
         if (n==0) {
             StaticResource sr = [select Body from StaticResource where Name = 'BPData'];
             List<Weight__c> theData = (List<Weight__c>) JSON.deserialize(sr.Body.toString(), List<Weight__c>.class);
+            // Now, see if the data needs "freshening." We need to do this because otherwise the "LAST-N" SOQL
+            // functions that we use may not return any data. Plus, we want the app to look up-to-date. So, we find
+            // the most-recent record in the list, calculate the days between that and today, and increment all the
+            // records by that amount. The difference will be zero on days where I upload a new release with a fresh
+            // JSON file of data AND somebody installs the package on that day. We don't want to rely upon the JSON
+            // file being in chronological order. We could sort the list, and then take element n-1, but it is probably
+            // faster to just run through and take the largest date. We can't query that db usng the max() function
+            // because of course there is nothing in the db yet.
+            Date maxDate = Date.newInstance(1960, 1, 1);
+            for (Weight__c w : theData) if (w.Date__c > maxDate) maxDate = w.Date__c;
+            integer daysToAdd = maxDate.daysBetween(Date.today());
+            if (daysToAdd>0) for (integer i=0;i<theData.size();i++) theData[i].Date__c=theData[i].Date__c.addDays(daysToAdd);
+            System.debug(' makeData() added this many days to each record: ' + daysToAdd);
             insert theData;
             showProgress='display: none;';
             makeChart();
@@ -151,16 +164,6 @@ public class BlubberPatrolCharts{
         if (chartData.endsWith(']')){chartData=chartData.left(chartData.length()-1);} 
         
         setChartOptions('Yearly Weight');
-
-/*        Weight__c ww = new Weight__c();
-        ww.Date__c = Date.today();
-        ww.Date__c=ww.Date__c.addDays(7);
-        System.debug(' - ww.Date__c = ' + ww.Date__c);
-        aggregateResult result = [Select max(Date__c) MaxDate from Weight__c];
-        System.debug(' - MaxDate = ' + result.get('MaxDate'));
-        Date d=Date.valueOf(result.get('MaxDate'));
-        System.debug(' d = ' + d);
-        System.debug(' Days to add = ' + d.daysBetween(Date.today()));*/
     }
 
     private void makeYearlyChartOld(integer years){    
@@ -184,6 +187,9 @@ public class BlubberPatrolCharts{
             if (theData.size()==0) theData.add(cd); else theData.add(0,cd);
         }
         formatChartOld(theData,'Yearly Weight');
+        //Undelete the next line when testing the install process. Once the package is installed on a 
+        //different org, you can debug from the developer console, and will need an empty db.
+        //delete [select id from Weight__c];
     }
 
     private void makeQuarterlyChartNew(integer quarters){ 

@@ -1,5 +1,3 @@
-Resume: Use the test code in makeYearlyChartNew() to freshen the data. It finds the correct number of days to add. It doesn't look like SOQL can update the entire table with one statement because it has no date-arithmatic column functions. So, we will have to pull down the entire table into a list, loop through updating the dates, and then update the table with a bulk update. Or loop through the list right after importing, and do the updates there, so that we will still only have the one insert operation.
-
 Strategy: Polish the package. Then a Lightning version of BP.
 Priority: Get "Resume Ready" so that we can jump on any plumb opportunities that pop-up as we continue to polish.
 Priority: First draft of README page on GitHub. Explanation of app, screenshot, known issues, etc.
@@ -9,14 +7,14 @@ Priority: First draft of README page on GitHub. Explanation of app, screenshot, 
 * The daily chart needs to start from the last day in the db, not today() and proceed backward. It is losing bars now.
 
 To Do - Packaging
+0) Need smaller dots GIF for first-run.
 0) Figure out how to put our VF page on the Weight tab, or open it automatically. Right now, we have to use Setup to find it.
 1) Send email from install method?
 2) Write up some release notes, put them on Triv.com, and add the URL to the final package upload.
-3) Freshen the dates after installing sample data?
-4) Announce the app on LinkedIn & Slack. Ask for help with the text inputs being to far from the radiobuttons?
-5) We are exceeding the SOQL limit when we run tests, but it doesn't prevent us from passing.
-6) The Data Loader only seems to be able to export in CSV format, but we need JSON format to import a static resource file during the import process. So, convert the CSV file with this website: http://www.convertcsv.com/csv-to-json.htm
-7) Package Description: This is a practice app that I wrote to learn Apex/Visualforce. It consists of a custom object where you can enter your weight each day, and a Visualforce page to make charts of various time periods using the Google Chart & Visualization APIs.
+3) Announce the app on LinkedIn & Slack. Ask for help with the text inputs being to far from the radiobuttons?
+4) We are exceeding the SOQL limit when we run tests, but it doesn't prevent us from passing.
+5) The Data Loader only seems to be able to export in CSV format, but we need JSON format to import a static resource file during the import process. So, convert the CSV file with this website: http://www.convertcsv.com/csv-to-json.htm
+6) Package Description: This is a practice app that I wrote to learn Apex/Visualforce. It consists of a custom object where you can enter your weight each day, and a Visualforce page to make charts of various time periods using the Google Chart & Visualization APIs.
 
 
 To Do:
