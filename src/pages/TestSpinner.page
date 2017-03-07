@@ -1,0 +1,23 @@
+<apex:page >
+  <!-- Since the spinner is only shown during a new installation, it is a pain to test. You have to upload
+  	   a new package & install it on another dev org. So, the purpose of this page is to just speed up the 
+  	   process of tweaking the divs in question. So, experiment with changes here, and then copy them over
+  	   to BlubberPatrol.page and/or BPStyle.resource. -->
+
+  <apex:stylesheet value="{!$Resource.BPStyle}" />
+
+  <h1>Spinner Test</h1>
+  
+  <div style="block"> <!-- Don't copy this over! -->
+    <div class="popupBackground"></div>
+    <div class="popupPanel">
+        <table border="0" width="100%" height="100%">
+            <tr>
+            	<td align="left"><img height="50" width="50" src="{!$Resource.BPWaitGIF}"/></td>
+            	<td align="left"><p style="font-size: 16px"><b>Installing sample data...</b></p></td>
+          	</tr>
+        </table>
+    </div>
+</div>
+ 
+</apex:page>
