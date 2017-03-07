@@ -78,7 +78,7 @@ public class BlubberPatrolCharts{
             // records by that amount. The difference will be zero on days where I upload a new release with a fresh
             // JSON file of data AND somebody installs the package on that day. We don't want to rely upon the JSON
             // file being in chronological order. We could sort the list, and then take element n-1, but it is probably
-            // faster to just run through and take the largest date. We can't query that db usng the max() function
+            // faster to just run through and take the largest date. We can't query the db usng the max() function
             // because of course there is nothing in the db yet.
             Date maxDate = Date.newInstance(1960, 1, 1);
             for (Weight__c w : theData) if (w.Date__c > maxDate) maxDate = w.Date__c;

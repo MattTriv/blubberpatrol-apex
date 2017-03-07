@@ -89,8 +89,10 @@
                             <div class="popupBackground"></div>
                             <div class="popupPanel">
                                 <table border="0" width="100%" height="100%">
-                                    <tr><td align="center"><p style="font-size: 14px"><b>Installing sample data...</b></p></td></tr>
-                                    <tr><td align="center"><img src="{!$Resource.BPWaitGIF}"/></td></tr>
+                                    <tr>
+                                        <td align="left"><img height="50" width="50" src="{!$Resource.BPWaitGIF}"/></td>
+                                        <td align="left"><p style="font-size: 16px"><b>Installing sample data...</b></p></td>
+                                    </tr>
                                 </table>
                             </div>
                         </div>
