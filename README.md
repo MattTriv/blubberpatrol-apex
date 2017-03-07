@@ -16,8 +16,4 @@ When I began this project, I used the Salesforce Developer Console, which is a p
 I have tested BlubberPatrol in a fresh developer org. I don't know how it will behave in other types of orgs.
 
 <h3>Unmanaged Package Problem</h3>
-When I began this project, there was no generally accepted way of having an unmanaged package insert its data automatically. If you implemented the installHandler interface, Salesforce would just ignore it. If you install BlubberPatrol, you will see how smoothly my solution works. It was a pretty tricky problem, and I explain how to do it in a blog post titled: 
-
-[How to Insert Sample Data in a Salesforce Unmanaged Package](http://www.trivisonno.com/programming/sfdc-unmanaged-package){:target=_blank}
-
-<a href="http://www.trivisonno.com/programming/sfdc-unmanaged-package" target="_blank">How to Insert Sample Data in a Salesforce Unmanaged Package</a>.
+When I began this project, there was no generally accepted way of having an unmanaged package insert its data automatically. If you implemented the installHandler interface, Salesforce would just ignore it. If you install BlubberPatrol, you will see how smoothly my solution works. It was a pretty tricky problem, and I explain how to do it in a blog post titled: <a href="http://www.trivisonno.com/programming/sfdc-unmanaged-package" target="_blank">How to Insert Sample Data in a Salesforce Unmanaged Package</a>.
