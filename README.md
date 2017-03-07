@@ -1,4 +1,4 @@
-# blubberpatrol-apex
+# BlubberPatrol for Apex/Visualforce
 
 <p>
 
@@ -9,5 +9,5 @@ BlubberPatrol is a practice app that I wrote to learn Salesforce Apex &amp; Visu
 </p>
 
 <p>
-When I began this project, I used the Salesforce Developer Console, which is a pretty good tool. However, for some reason it was <i>extremely</i> slow to scroll through log files. So, I switched to Sublime Text 3 with the MavensMate plugin. And that also allowed me to use SourceTree to upload my files to GitHub.
+When I began this project, I used the Salesforce Developer Console, which is a pretty good tool. However, for some reason it was <i>extremely</i> slow to scroll through log files. So, I switched to Sublime Text 3 with the MavensMate plugin. And that also allowed me to put my files into version control with SourceTree and upload them to GitHub.
 </p>
