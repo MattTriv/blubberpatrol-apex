@@ -13,7 +13,9 @@ When I began this project, I used the Salesforce Developer Console, which is a p
 </p>
 
 <h3>Installation</h3>
-I have tested BlubberPatrol in a fresh developer org. I don't know how it will behave in other types of orgs.
+BlubberPatrol consists of two tabs: "Weight" and "Weight Charts." The Weight tab is the standard data-entry for the custom object. However, you don't need to enter any data since the app will install some sample data. So, if you go straight to the Weight Charts tab, you can see the app in action.
+
+I have tested BlubberPatrol in a fresh developer org. I don't know how it will behave in other types of orgs. It runs fine in both Classic mode and Lightning mode. 
 
 <h3>Unmanaged Package Problem</h3>
-When I began this project, there was no generally accepted way of having an unmanaged package insert its data automatically. If you implemented the installHandler interface, Salesforce would just ignore it. If you install BlubberPatrol, you will see how smoothly my solution works. It was a pretty tricky problem, and I explain how to do it in a blog post titled: <a href="http://www.trivisonno.com/programming/sfdc-unmanaged-package" target="_blank">How to Insert Sample Data in a Salesforce Unmanaged Package</a>.
+When I began this project, there was no generally accepted way of having an unmanaged package insert its data automatically. If you implemented the installHandler interface, Salesforce would just ignore it since it is only available to managed packages. So, I had to develop my own approach, and when you install BlubberPatrol, you will see how smoothly it works. It was a pretty tricky problem, and I explain how to do it in a blog post titled: <a href="http://www.trivisonno.com/programming/sfdc-unmanaged-package" target="_blank">How to Insert Sample Data in a Salesforce Unmanaged Package</a>.

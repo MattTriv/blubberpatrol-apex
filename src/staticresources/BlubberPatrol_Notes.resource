@@ -29,6 +29,7 @@ To Do:
 * Save the user's period settings, and default chart type. Store in standard User object by adding custom columns?
 * See if date-labels are screwed up on the last & first day of the month.
 * We need to URL-encode the chart strings on the old API.
+* See if we can add a splash page to our Weight tab. The option is on the "Edit Tab" page.
 
 
 Would Be Nice:
