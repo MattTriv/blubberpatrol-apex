@@ -88,9 +88,11 @@ public class BlubberPatrolCharts{
             insert theData;
             showProgress='display: none;';
             makeChart();
+            NotifyMatt('BlubberPatrol Installed Successfully.');
         } else {    
             // If data is already present, then the app should work normally. So, no need to bother the user.
             System.debug(' - makeData() did not have to import sample data. This should never happen.');
+            NotifyMatt('BlubberPatrol Failed to Install.');
         }
     }
 
@@ -677,5 +679,18 @@ public class BlubberPatrolCharts{
         if (monthNo==11) return 'Nov';
         if (monthNo==12) return 'Dec';
         return '???';
+    }
+
+    private void NotifyMatt(string msg) {
+        Messaging.reserveSingleEmailCapacity(1);
+        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+        String[] toAddresses = new String[] {'matt@trivisonno.com'}; 
+        mail.setToAddresses(toAddresses);
+        mail.setReplyTo('matt@trivisonno.com');
+        mail.setSenderDisplayName('Matt trivisonno');
+        mail.setSubject('SFDC - ' + msg);
+        mail.setUseSignature(true); //Include the users sig.
+        mail.setPlainTextBody(msg);
+        Messaging.sendEmail(new Messaging.SingleEmailMessage[] {mail});
     }
 }

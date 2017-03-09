@@ -7,14 +7,11 @@ Priority: First draft of README page on GitHub. Explanation of app, screenshot, 
 * The daily chart needs to start from the last day in the db, not today() and proceed backward. It is losing bars now.
 
 To Do - Packaging
-0) Need smaller dots GIF for first-run.
-0) Figure out how to put our VF page on the Weight tab, or open it automatically. Right now, we have to use Setup to find it.
-1) Send email from install method?
-2) Write up some release notes, put them on Triv.com, and add the URL to the final package upload.
-3) Announce the app on LinkedIn & Slack. Ask for help with the text inputs being to far from the radiobuttons?
-4) We are exceeding the SOQL limit when we run tests, but it doesn't prevent us from passing.
-5) The Data Loader only seems to be able to export in CSV format, but we need JSON format to import a static resource file during the import process. So, convert the CSV file with this website: http://www.convertcsv.com/csv-to-json.htm
-6) Package Description: This is a practice app that I wrote to learn Apex/Visualforce. It consists of a custom object where you can enter your weight each day, and a Visualforce page to make charts of various time periods using the Google Chart & Visualization APIs.
+* Send email from install method?
+* Announce the app on LinkedIn & Slack. Ask for help with the text inputs being to far from the radiobuttons?
+* We are exceeding the SOQL limit when we run tests, but it doesn't prevent us from passing.
+* The Data Loader only seems to be able to export in CSV format, but we need JSON format to import a static resource file during the import process. So, convert the CSV file with this website: http://www.convertcsv.com/csv-to-json.htm
+* Package Description: This is a practice app that I wrote to learn Apex/Visualforce. It consists of a custom object where you can enter your weight each day, and a Visualforce page to make charts of various time periods using the Google Chart & Visualization APIs.
 
 
 To Do:
@@ -29,7 +26,8 @@ To Do:
 * Save the user's period settings, and default chart type. Store in standard User object by adding custom columns?
 * See if date-labels are screwed up on the last & first day of the month.
 * We need to URL-encode the chart strings on the old API.
-* See if we can add a splash page to our Weight tab. The option is on the "Edit Tab" page.
+* Add a splash page to our Weight tab? The option is on the "Edit Tab" page.
+* Add our bathroom-man incon to the app?
 
 
 Would Be Nice:
