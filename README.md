@@ -13,7 +13,8 @@ When I began this project, I used the Salesforce Developer Console, which is a p
 </p>
 
 <h3>Installation</h3>
-<p align="center"><b><a href="https://login.salesforce.com/packaging/installPackage.apexp?p0=04t41000002Vcrt">Click here to install BlubberPatrol into your SFDC org</a>.</b>
+<p align="center"><b><a href="https://login.salesforce.com/packaging/installPackage.apexp?p0=04t41000002Vcrt">Click here to install BlubberPatrol into your SFDC org</a>.</b></p>
+
 BlubberPatrol consists of two tabs: "Weight" and "Weight Charts." The Weight tab is the standard data-entry for the custom object. However, you don't need to enter any data since the app will install some sample data. So, if you go straight to the Weight Charts tab, you can see the app in action.
 
 I have tested BlubberPatrol in a fresh developer org. I don't know how it will behave in other types of orgs. It runs fine in both Classic mode and Lightning mode. 
